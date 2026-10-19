@@ -30,8 +30,8 @@ The main driver `ensemble_analyzer` accepts various command-line arguments to co
 * **`-cut-off`**, **`--cut-off`** (float)
     The frequency cut-off value ($\omega_0$) for the Grimme qRRHO approximation (default: `100.0` cm⁻¹).
 
-* **`-no-H`**, **`--exclude-H`**
-    If set, excludes Hydrogen atoms from RMSD and PCA distance matrix calculations.
+* **`-incl-H`**, **`--include-H`**
+    If set, includes Hydrogen atoms in RMSD and PCA distance matrix calculations (default: Hydrogen atoms are excluded).
 
 
 * **`-cpu`** (int)

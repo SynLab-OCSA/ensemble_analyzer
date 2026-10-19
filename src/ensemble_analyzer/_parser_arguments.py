@@ -142,10 +142,10 @@ def parser_arguments()-> argparse.Namespace:
     )
 
     molecule_group.add_argument(
-        "-no-H",
-        "--exclude-H",
-        help="Exclude hydrogen atoms for the PCA analysis and for the RSMD calculation. Default %(default)s: All atoms are considered for PCA and RMSD",
-        action="store_false",
+        "-incl-H",
+        "--include-H",
+        help="Include hydrogen atoms in the PCA analysis and in the RMSD calculation. Default %(default)s: hydrogen atoms are excluded from PCA and RMSD",
+        action="store_true",
     )
     # molecule_group.add_argument('-no-enantio', '--exclude-enantiomers', help='Exclude the enantiomeric conformation. Default %(default)s: no check with others conformation\'s mirror image is performed', action='store_true')
 

@@ -11,7 +11,7 @@ def test_calculation_config_defaults():
     config = CalculationConfig()
     assert config.temperature == 298.15
     assert config.cpu > 0
-    assert config.include_H is True
+    assert config.include_H is False
 
 def test_protocol_calculator_retrieval():
     """Test the get_calculator helper on Protocol."""

@@ -12,8 +12,8 @@ def parse_args() -> argparse.Namespace:
 Examples:
 # Basic PCA with 5 clusters
 python clustering.py ensemble.xyz -nc 5
-# Auto-detect optimal clusters, exclude hydrogen
-python clustering.py ensemble.xyz --no-H
+# Auto-detect optimal clusters, include hydrogen
+python clustering.py ensemble.xyz --include-H
 # Save reduced ensemble
 python clustering.py ensemble.xyz -nc 10 --save-reduced
 # Custom output and title
@@ -24,8 +24,8 @@ python clustering.py ensemble.xyz -o my_pca.png --title "Drug Conformers"
     parser.add_argument('file', help='Input ensemble file (XYZ format)')
     parser.add_argument('-nc', '--ncluster', type=int, default=None,
                         help='Number of clusters (default: auto-detect using silhouette score)')
-    parser.add_argument('--no-H', action='store_false', dest='include_H',
-                        help='Exclude hydrogen atoms from distance matrix calculation')
+    parser.add_argument('--include-H', action='store_true', dest='include_H',
+                        help='Include hydrogen atoms in distance matrix calculation (default: excluded)')
     parser.add_argument('--no-legend', action='store_false', dest='legend',
                         help='Exclude conformer legend from plot')
     parser.add_argument('--title', default='PCA Cluster Analysis',

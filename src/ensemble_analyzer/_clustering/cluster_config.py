@@ -26,7 +26,7 @@ class ClusteringConfig:
     Configuration parameters for clustering operations.
     """
     n_clusters: Optional[int] = None    # Target clusters (None = auto)
-    include_H: bool = True              # Include Hydrogens in distance matrix
+    include_H: bool = False             # Include Hydrogens in distance matrix
     set_cluster_attribute: bool = True  # Write cluster ID to conformer objects
     min_k: int = 2                      # Min clusters for silhouette search
     max_k: int = 30                     # Max clusters for silhouette search

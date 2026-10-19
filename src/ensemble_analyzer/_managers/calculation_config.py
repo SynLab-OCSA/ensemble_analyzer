@@ -19,7 +19,7 @@ class CalculationConfig:
     cpu: int = 1 
     temperature: float = 298.15
     start_from_protocol: int = 0
-    include_H: bool = True
+    include_H: bool = False
     restart: bool = False
 
     # Graph settings
@@ -84,7 +84,7 @@ class CalculationConfig:
             cpu=settings.get("cpu", args.cpu),
             temperature=settings.get("temperature", args.temperature),
             start_from_protocol=start_from_protocol,
-            include_H=settings.get("include_H", not args.exclude_H),
+            include_H=settings.get("include_H", args.include_H),
             definition=settings.get("definition", args.definition),
             fwhm={
                 'vibro': settings.get("fwhm_vibro", args.fwhm_vibro),
@@ -124,7 +124,7 @@ class CalculationConfig:
             "interested_vibro": args.interest_vibro,
             "interested_electro": args.interest_electro,
             "invert": args.invert,
-            "include_H": not args.exclude_H,
+            "include_H": args.include_H,
             "restart": args.restart,
         }
     
@@ -192,7 +192,7 @@ class CalculationConfig:
             cpu=settings["cpu"],
             temperature=settings["temperature"],
             start_from_protocol=settings.get("start_from_protocol", 0),
-            include_H=settings.get("include_H", True),
+            include_H=settings.get("include_H", False),
             definition=settings.get("definition", 4),
             fwhm={
                 'vibro': settings.get("fwhm_vibro"),

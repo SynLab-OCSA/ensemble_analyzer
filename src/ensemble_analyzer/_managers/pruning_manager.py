@@ -48,13 +48,13 @@ class PruningManager:
     Manages the ensemble refinement process (filtering and de-duplication).
     """
 
-    def __init__(self, logger : Logger, include_H : bool = True): 
+    def __init__(self, logger : Logger, include_H : bool = False):
         """
         Initialize the PruningManager.
 
         Args:
             logger (Logger): Logger instance.
-            include_H (bool, optional): Whether to include Hydrogens in RMSD checks. Defaults to True.
+            include_H (bool, optional): Whether to include Hydrogens in RMSD checks. Defaults to False.
         """
 
         self.logger = logger

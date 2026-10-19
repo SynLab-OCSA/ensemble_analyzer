@@ -18,7 +18,7 @@ def execute_PCA(
     title: str,
     log: Logger,
     set_: bool = True,
-    include_H: bool = True,
+    include_H: bool = False,
     legend: bool = True
 ) -> bool:
     """Execute PCA-based clustering on the conformer ensemble.

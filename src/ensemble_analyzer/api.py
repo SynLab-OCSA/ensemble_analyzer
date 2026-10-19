@@ -148,7 +148,7 @@ def run(
     disable_color: bool = False,
     cpu: int = 1,
     temperature: float = 298.15,
-    include_H: bool = True,
+    include_H: bool = False,
     **config: Any,
 ) -> EnsembleResult:
     """

@@ -52,7 +52,7 @@ class TestCalculationConfig:
         args.interest_vibro = None
         args.interest_electro = None
         args.invert = False
-        args.exclude_H = False
+        args.include_H = False
         args.restart = True
 
         m = mock_open()
@@ -73,7 +73,7 @@ class TestCalculationConfig:
         args.interest_vibro = None
         args.interest_electro = None
         args.invert = False
-        args.exclude_H = False
+        args.include_H = False
         args.restart = False
 
         settings_data = json.dumps({"cpu": 16, "temperature": 350.0})
