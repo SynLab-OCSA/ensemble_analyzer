@@ -61,7 +61,7 @@ class Logger(logging.Logger):
 
         self._separator("Calculation Input")
         self.info(f"Ensemble: {config.get('conformers', 'N/A')} confromer(s)")
-        self.info(f'Protocols: {config.get('len_protocols', 'N/A')}')
+        self.info(f"Protocols: {config.get('len_protocols', 'N/A')}")
         self.info(f"Temperature: {config.get('temperature', 'N/A')} K")
         self.info(f"CPU cores: {config.get('cpu', 'N/A')}")
         if config.get('restart', False):

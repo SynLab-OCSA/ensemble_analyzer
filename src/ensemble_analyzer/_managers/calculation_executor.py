@@ -50,7 +50,7 @@ class CalculationExecutor:
 
             self._log_imaginary_localization(conf, protocol)
 
-            if attempt == 0 and protocol.opt and protocol.freq:
+            if protocol.opt and protocol.freq:
                 need_retry, new_geom = self._check_imaginary_and_displace(
                     conf, protocol,
                 )
