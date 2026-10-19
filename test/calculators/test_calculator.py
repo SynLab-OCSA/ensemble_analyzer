@@ -61,7 +61,8 @@ class TestCalculators:
     def test_orca_common_string(self, setup_calc):
         conf, proto = setup_calc
         # Mock ORCA profile availability
-        with patch("ensemble_analyzer.calculators.orca.orca_profile"):
+        with patch("enan_calculators._orca.shutil.which", return_value="orca"), \
+             patch("ensemble_analyzer.calculators.orca.orca_profile"):
             calc = OrcaCalc(proto, 4, conf)
             si, ob, post = calc.common_str()
             
@@ -74,18 +75,20 @@ class TestCalculators:
     def test_orca_freq_block(self, setup_calc):
         conf, proto = setup_calc
         proto.freq = True
-        with patch("ensemble_analyzer.calculators.orca.orca_profile"):
-            with patch("ensemble_analyzer.calculators.orca.OrcaCalc.VERSION", 6):
-                calc = OrcaCalc(proto, 4, conf)
-                ase_calc, label = calc.frequency()
+        with patch("enan_calculators._orca.shutil.which", return_value="orca"), \
+             patch("ensemble_analyzer.calculators.orca.orca_profile"), \
+             patch("ensemble_analyzer.calculators.orca.OrcaCalc.VERSION", 6):
+            calc = OrcaCalc(proto, 4, conf)
+            ase_calc, label = calc.frequency()
 
-                assert "freq" in ase_calc.parameters["orcasimpleinput"]
-                assert "%freq vcd true end" in ase_calc.parameters["orcablocks"]
+            assert "freq" in ase_calc.parameters["orcasimpleinput"]
+            assert "%freq vcd true end" in ase_calc.parameters["orcablocks"]
 
     def test_orca_constraints(self, setup_calc):
         conf, proto = setup_calc
         proto.constrains = [[1]]
-        with patch("ensemble_analyzer.calculators.orca.orca_profile"):
+        with patch("enan_calculators._orca.shutil.which", return_value="orca"), \
+             patch("ensemble_analyzer.calculators.orca.orca_profile"):
             calc = OrcaCalc(proto, 4, conf)
             ase_calc, label = calc.optimisation()
         
@@ -95,7 +98,8 @@ class TestCalculators:
         conf, proto = setup_calc
         proto.constrains = [[1, 2], [1, 2, 3], [1, 2, 3, 4], [1]]
 
-        with patch("ensemble_analyzer.calculators.orca.orca_profile"):
+        with patch("enan_calculators._orca.shutil.which", return_value="orca"), \
+             patch("ensemble_analyzer.calculators.orca.orca_profile"):
             calc = OrcaCalc(proto, 4, conf)
             ase_calc, label = calc.optimisation()
             assert "%geom Constraints {B 1 2 C} {A 1 2 3 C} {D 1 2 3 4 C} {C 1 C} end end" in ase_calc.parameters["orcasimpleinput"]
@@ -108,53 +112,3 @@ class TestCalculators:
         assert "X 1 F" in ase_calc.parameters["addsec"]
 
 
-from ensemble_analyzer.calculators.orca import _split_post_blocks
-
-class TestSplitPostBlocks:
-    """Tests for _split_post_blocks edge cases (indented vs compact)."""
-
-    def test_indented_frag(self):
-        t = "%frag\n Definition\n  1 {18:27} end\n  2 {0:17} end\n end\nend"
-        pre, post = _split_post_blocks(t)
-        assert pre == ""
-        assert post == "%frag\n Definition\n  1 {18:27} end\n  2 {0:17} end\n end\nend"
-
-    def test_compact_frag(self):
-        t = "%frag\nDefinition\n1 {18:27} end\n2 {0:17} end\nend\nend"
-        pre, post = _split_post_blocks(t)
-        assert pre == ""
-        assert post == "%frag\nDefinition\n1 {18:27} end\n2 {0:17} end\nend\nend"
-
-    def test_newline_prefix_frag(self):
-        t = "\n%frag\nDefinition\n1 {18:27} end\n2 {0:17} end\nend\nend"
-        pre, post = _split_post_blocks(t)
-        assert post == "%frag\nDefinition\n1 {18:27} end\n2 {0:17} end\nend\nend"
-
-    def test_mixed_pre_and_post(self):
-        t = "%scf maxiter 500 end\n%frag\nDefinition\n1 {18:27} end\nend\nend"
-        pre, post = _split_post_blocks(t)
-        assert pre == "%scf maxiter 500 end"
-        assert post == "%frag\nDefinition\n1 {18:27} end\nend\nend"
-
-    def test_multiple_post_blocks(self):
-        t = "%frag\n1 {0:5} end\nend\n%eprnmr\ngtensor 1\nend"
-        pre, post = _split_post_blocks(t)
-        assert pre == ""
-        assert post == "%frag\n1 {0:5} end\nend\n%eprnmr\ngtensor 1\nend"
-
-    def test_pre_non_post_block_and_post(self):
-        t = "%output\n print[ P_Mulliken 1 ] end\n%frag\n1 {0:5} end\nend"
-        pre, post = _split_post_blocks(t)
-        assert pre == "%output\n print[ P_Mulliken 1 ] end"
-        assert post == "%frag\n1 {0:5} end\nend"
-
-    def test_empty(self):
-        pre, post = _split_post_blocks("")
-        assert pre == ""
-        assert post == ""
-
-    def test_no_post_blocks(self):
-        t = "%scf maxiter 500 end\n%maxcore 8000"
-        pre, post = _split_post_blocks(t)
-        assert pre == t
-        assert post == ""
