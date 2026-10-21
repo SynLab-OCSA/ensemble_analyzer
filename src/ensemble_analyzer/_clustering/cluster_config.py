@@ -13,7 +13,7 @@ class PCAResult:
     clusters: np.ndarray            # Cluster labels (n_samples,)
     colors: List[str]               # Hex colors for each point
     numbers: List[int]              # Conformer IDs
-    energies: np.ndarray            # Relative energies array
+    energies: Optional[np.ndarray]  # Relative energies array (None if unavailable)
     explained_variance: np.ndarray  # Variance ratio per component
     n_clusters: Optional[int] = None # Number of clusters found/used
     original_features: Optional[np.ndarray] = None  # Added for before/after plot

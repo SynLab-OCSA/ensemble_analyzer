@@ -25,11 +25,13 @@ def _parse_xyz_str(fl: List[str], raw: bool =False) -> Tuple[np.ndarray, np.ndar
         raw (bool, optional): Convert the energy in the comment line. Defaults to False.
 
     Returns:
-        Tuple[np.ndarray, np.ndarray, Optional[float]]: Atoms, Geometry and eventually Energy.
+        Tuple[np.ndarray, np.ndarray, Optional[float]]: Atoms, Geometry and eventually Energy
+            (None if the comment line holds no energy).
     """
     e = None
     if raw:
-        e = float(re.findall(r'([- ]\d*\.\d*)', fl[1].strip())[0])
+        match = re.findall(r'([- ]\d*\.\d*)', fl[1].strip())
+        e = float(match[0]) if match else None
     fl = fl[2:]
     atoms, geom = [], []
     for line in fl:
@@ -67,15 +69,22 @@ def read_ensemble(file: str, log: Optional[Logger] = None, raw: bool=False) -> l
     n_atoms = int(fl[0])
     old_idx = 0
     counter = 1
+    n_missing = 0
     for i in range(0, len(fl) + 1, n_atoms + 2):
         if i == old_idx:
             continue
         atoms, geom, e = _parse_xyz_str(fl[old_idx:i], raw=raw)
         confs.append(Conformer(counter, geom=geom, atoms=atoms))
-        if raw: 
+        if raw:
+            if e is None:
+                n_missing += 1
+                e = np.nan
             confs[-1].energies.add(protocol_number="0", record=EnergyRecord(E=e))
         old_idx = i
         counter += 1
+
+    if n_missing and log is not None:
+        log.warning(f"Could not find energies for {n_missing} conformers, proceeding without energies")
 
     return confs
 

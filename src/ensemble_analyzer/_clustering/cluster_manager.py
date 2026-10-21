@@ -201,8 +201,11 @@ class ClusteringManager:
         geometries = np.array([c.last_geometry for c in conformers])
         colors = [c.color for c in conformers]
         numbers = [c.number for c in conformers]
-        energies = np.array([c.energies.get_energy() for c in conformers])
-        energies = (energies - energies.min()) * EH_TO_KCAL  # Relative energies
+        energies = np.array([c.energies.get_energy() for c in conformers], dtype=float)
+        if np.isnan(energies).any():
+            energies = None  # Energies missing: no energy surface
+        else:
+            energies = (energies - energies.min()) * EH_TO_KCAL  # Relative energies
         
         # Step 2: Calculate distance matrix eigenvalues
         self.logger.debug("Calculating distance matrices...")
@@ -364,44 +367,48 @@ class ClusteringManager:
         
         rcParams.update({"figure.autolayout": True})
         
-        # Create grid: main plot + colorbar
-        gs = gridspec.GridSpec(2, 1, height_ratios=[3, 0.1], hspace=0.3)
-        ax_main = fig.add_subplot(gs[0])
-        ax_colorbar = fig.add_subplot(gs[1])
-        
         # Extract data
         x = result.scores[:, 0]
         y = result.scores[:, 1]
         z = result.energies
-        
-        # Create interpolated grid for contours
-        resolution = DEFAULT_RESOLUTION
-        xi = np.linspace(x.min(), x.max(), resolution)
-        yi = np.linspace(y.min(), y.max(), resolution)
-        xi, yi = np.meshgrid(xi, yi)
-        zi = griddata((x, y), z, (xi, yi), method='linear')
-        
-        # Plot energy surface
-        im = ax_main.pcolormesh(
-            xi, yi, zi,
-            shading='auto',
-            cmap='coolwarm',
-            alpha=0.75
-        )
-        
-        # Add contour lines
-        ax_main.contour(
-            xi, yi, zi,
-            levels=6,
-            colors='grey',
-            linestyles='--',
-            linewidths=0.5,
-            alpha=0.6
-        )
-        
-        # Colorbar
-        cbar = plt.colorbar(im, cax=ax_colorbar, orientation='horizontal')
-        cbar.set_label('Relative Energy [kcal/mol]', fontsize=10)
+
+        if z is None:
+            # No energies: scatter only
+            ax_main = fig.add_subplot(111)
+        else:
+            # Create grid: main plot + colorbar
+            gs = gridspec.GridSpec(2, 1, height_ratios=[3, 0.1], hspace=0.3)
+            ax_main = fig.add_subplot(gs[0])
+            ax_colorbar = fig.add_subplot(gs[1])
+
+            # Create interpolated grid for contours
+            resolution = DEFAULT_RESOLUTION
+            xi = np.linspace(x.min(), x.max(), resolution)
+            yi = np.linspace(y.min(), y.max(), resolution)
+            xi, yi = np.meshgrid(xi, yi)
+            zi = griddata((x, y), z, (xi, yi), method='linear')
+
+            # Plot energy surface
+            im = ax_main.pcolormesh(
+                xi, yi, zi,
+                shading='auto',
+                cmap='coolwarm',
+                alpha=0.75
+            )
+
+            # Add contour lines
+            ax_main.contour(
+                xi, yi, zi,
+                levels=6,
+                colors='grey',
+                linestyles='--',
+                linewidths=0.5,
+                alpha=0.6
+            )
+
+            # Colorbar
+            cbar = plt.colorbar(im, cax=ax_colorbar, orientation='horizontal')
+            cbar.set_label('Relative Energy [kcal/mol]', fontsize=10)
         
         # Plot conformers with cluster-specific markers
         for idx in range(len(x)):
